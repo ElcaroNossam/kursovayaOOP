@@ -132,8 +132,9 @@
                     this.mouseY = 0;
 
                  this.currentState = new NormalState(this);
-
+                
                 }
+
                 startState(stateClass){
                     this.currentState.finalize();
                     this.currentState = new stateClass(this);
@@ -173,6 +174,9 @@
                 createFood(x, y){
                     this.createObjectOfClass(Food, x, y)
                 }
+                createFoodOrange(x, y){
+                    this.createObjectOfClass(FoodOrange, x, y)
+                }
 
                 createEnemy(x, y){
                     this.createObjectOfClass(Enemy, x, y)
@@ -200,13 +204,17 @@
                    this.createObjectOfClass(Defender,0,0);
                    this.createObjectOfClass(Defender,0,0);
                    this.createObjectOfClass(Defender,0,0);
-                   
-                   this.createSpawner(450,550)
-                   this.createSpawnerFood(100,50)
+                   this.createObjectOfClass(FoodOrange, 30,20)
+                   this.createSpawner(50,650)
+                   this.createSpawnerFood(50,40)
 
                     for (let i=0; i<100; i++){
                         this.createObjectOfClass(Food, 320,230)
                     }
+                    for (let i=0; i<100; i++){
+                        this.createObjectOfClass(FoodOrange, 320,230)
+                    }
+                   
                 }
                 createObjectOfClass(cl, x ,y){
                     let ob = new cl(x, y);
@@ -257,7 +265,7 @@
                     this.turnSpeed = 0.5;
                     this.targetCourse = this.course;
 
-                    this.image = PIXI.Sprite.from('img1.png');
+                    this.image = PIXI.Sprite.from('images.png');
                     this.image.scale.set(0.25)
                     this.image.anchor.set(0.5,0.5);
                     this.addChild(this.image);
@@ -362,6 +370,10 @@
             class Enemy extends MovingObject {
                 constructor(x, y) {
                     super(x, y, 0, 1 + Math.random());
+                    this.image = PIXI.Sprite.from('atac1.png');
+                    this.image.scale.set(0.25)
+                    this.image.anchor.set(0.8,0.8);
+                    this.addChild(this.image);
                     this.image.tint = 0xff0000;
                 }
                     makeDecision(){
@@ -454,7 +466,52 @@
                 class Food extends MovingObject{
                     constructor(x,y){
                         super(x,y, 2*Math.PI*Math.random(), 1+Math.random());
+                        this.image = PIXI.Sprite.from('food1.png');
+                        this.image.scale.set(0.15)
+                        this.image.anchor.set(0.5,0.5);
+                        this.addChild(this.image);
                         this.image.tint = 0xffff00;
+                    }
+                    makeDecision(){
+                        let dx = world.player.x-this.x;
+                        let dy = world.player.y-this.y;
+                        let d = Math.sqrt(dx*dx+dy*dy);
+
+                        if(d<=250){
+                            this.move2Point(this.x-dx, this.y-dy)
+                        } 
+
+                        if ((this.x<0)||(this.x>1900)||(this.y<0)||(this.y>910)){
+                            this.move2Point(Math.random()*1900, Math.random()*910);
+                        }
+                    }
+                    checkCollision(){
+                        let dx = world.player.x-this.x;
+                        let dy = world.player.y-this.y;
+                        let d = Math.sqrt(dx*dx+dy*dy);
+
+                        if (d<=22){
+                            this.mustBRemoved = true;
+                            world.player.onFoodEaten()
+                           
+                        }
+                    }
+                }
+
+                class FoodOrange extends MovingObject{
+                    constructor(x,y){
+                     super(x,y, 2*Math.PI*Math.random(), 3+Math.random());
+                        
+                   
+
+                    this.image = PIXI.Sprite.from('food.png');
+                    this.image.scale.set(0.25)
+                    this.image.anchor.set(0.8,0.8);
+                    this.addChild(this.image);
+                        
+                   
+                        
+                      this.image.tint = 0xFF6600;
                     }
                     makeDecision(){
                         let dx = world.player.x-this.x;
@@ -509,7 +566,7 @@
                       }
                     }
                 }
-                    let app = new PIXI.Application({width: 1900, height: 910});
+                    let app = new PIXI.Application({width: 1400, height: 800});
                     document.body.appendChild(app.view);
 
                     let world = new World(app.stage)
