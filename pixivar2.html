@@ -76,15 +76,18 @@
                             super(world);
                         }
                         initialize(){
-                            console.log("Game over.Your score:", this.world.player.score)
+                            console.log("Winner.Your score:", this.world.player.score)
                         }
                         handleKeyDown(e){
                             if(e.code=="Space"){
                                 
                                 this.world.clearAllObjects();
                                 this.world.createInitialObjects();
-                                this.world.player.removeOverTable();
-                                this.world.stage.removeChild(this.world.player.overTable);
+                                
+                                this.world.stage.removeChild(this.world.overTable);
+                               // this.world.stage.removeChild(this.world.scoreText);
+                                
+                                
                                 this.world.startState(NormalState)
            
                                 
@@ -135,22 +138,22 @@
 
                     this.mouseX = 0;
                     this.mouseY = 0;
-                    this.overTable = new PIXI.Text('Game Over', { fontFamily: 'Arial', fontSize: 64, fill: 0xffffff });
+                    this.overTable = new PIXI.Text('You Win', { fontFamily: 'Arial', fontSize: 164, fill: 0xffffff });
+                    this.scoreTable = new PIXI.Text('Score Table', { fontFamily: 'Arial', fontSize: 28, fill: 0xffffff });
+                    this.scoreText = new PIXI.Text('Score: 0', { fontFamily: 'Arial', fontSize: 24, fill: 0xffffff });
+                    
                     this.currentState = new NormalState(this);
                     this.scoreContainer = new PIXI.Container();
-                    this.stage.addChild(this.scoreContainer);
+                   
                 
-                }
-                showOverTable() {
-               
-                }
-
+                }      
+              
 
                 showScoreTable() {
-                  let scoreTable = new PIXI.Text('Score Table', { fontFamily: 'Arial', fontSize: 28, fill: 0xffffff });
-                         scoreTable.x = 10;
-                         scoreTable.y = 10;
-                          this.stage.addChild(scoreTable);
+                  
+                         this.scoreTable.x = 10;
+                         this.scoreTable.y = 10;
+                          this.stage.addChild(this.scoreTable);
                 }
 
                 startState(stateClass){
@@ -191,7 +194,7 @@
                     this.player.scoreText.setParent(this.scoreContainer);
                     this.player.scoreText.position.set(40, 40);
                     this.showScoreTable();
-                    this.showOverTable();
+                   
                   
                     
                 }
@@ -350,8 +353,10 @@
                     this.energy = 10;
                     this.isAccelerating = false;
                     this.scoreText = new PIXI.Text('Score: 0', { fontFamily: 'Arial', fontSize: 24, fill: 0xffffff });
-                    this.overTable = new PIXI.Text('Game Over', { fontFamily: 'Arial', fontSize: 64, fill: 0xffffff });
-                    this.addChild(this.scoreText);
+                    world.scoreText.x = 40;
+                                    world.scoreText.y = 40;
+                                    world.stage.addChild(world.scoreText);
+                   
                     }
                     step(dt){
                         super.step(dt);
@@ -392,17 +397,15 @@
                                     this.move2Point(foodOr.x, foodOr.y);
                                 }
                             }
-                            removeOverTable() {
-                                if (this.overTable && this.overTable.parent) {
-                                    this.overTable.parent.removeChild(this.overTable);
-                                }
-                            }
-                      checkWinCondition() {
+                          
+                                checkWinCondition() {
+                                    
                                 if (this.score >= 500) {
                                      console.log("Пользователь выиграл!");
-                                    world.overTable.x = 400;
+                                     world.overTable.x = 400;
                                      world.overTable.y = 350;   
                                      world.stage.addChild(world.overTable);
+                                    
                                      world.startState(GameOverState);
                                     
                                     
@@ -413,7 +416,7 @@
                             onFoodEaten(){
                                   this.score += 5;
                                   this.energy += 1;                            
-                                  this.scoreText.text = `Score: ${this.score}`;
+                                  world.scoreText.text = `Score: ${this.score}`;
                                   let nextDefenderPrice = 10 * (Defender.numDefenders + 1);
                                   if (this.energy >= 20) {
                                   if (Defender.numDefenders < 3) {
