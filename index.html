@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <html>
     <head>
 
@@ -36,3 +37,22 @@
         </script>
     </body>
 </html>
+=======
+const { app, BrowserWindow } = require('electron')
+
+function createWindow () {
+  const win = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      nodeIntegration: true
+    }
+  })
+
+  win.loadFile('C:\papka\kursovayaOOP\pixivar2.html')
+}
+
+app.whenReady().then(() => {
+  createWindow()
+})
+>>>>>>> 7ff42789e5142e6dd8726d1e06e6c676d59a88dc
