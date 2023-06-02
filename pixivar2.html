@@ -135,12 +135,14 @@
                 constructor(stage) {
                     this.stage = stage;
                     this.objects = [];
-
+                    this.lifeTime = 0;
+                    this.lastScoreTime = 0;
                     this.mouseX = 0;
                     this.mouseY = 0;
                     this.overTable = new PIXI.Text('You Win', { fontFamily: 'Arial', fontSize: 164, fill: 0xffffff });
                     this.scoreTable = new PIXI.Text('Score Table', { fontFamily: 'Arial', fontSize: 28, fill: 0xffffff });
                     this.scoreText = new PIXI.Text('Score: 0', { fontFamily: 'Arial', fontSize: 24, fill: 0xffffff });
+                    this.score = new PIXI.Text('0', { fontFamily: 'Arial', fontSize: 24, fill: 0xffffff });
                     
                     this.currentState = new NormalState(this);
                     this.scoreContainer = new PIXI.Container();
@@ -148,12 +150,23 @@
                 
                 }      
               
+                showAddScore(val) {
+                    this.score.text +="\n"+ val;
 
+                }
+                removeFirstScore(){
+                    let ar = this.score.text.split("\n")
+                    if(ar.length>=0){
+                        ar.splice(0,1);
+                        this.score.text = ar.join("\n");
+                        
+                    }
+                } 
                 showScoreTable() {
                   
-                         this.scoreTable.x = 10;
-                         this.scoreTable.y = 10;
-                          this.stage.addChild(this.scoreTable);
+                    this.scoreTable.x = 10;
+                    this.scoreTable.y = 10;
+                    this.stage.addChild(this.scoreTable);
                 }
 
                 startState(stateClass){
@@ -162,7 +175,18 @@
                     this.currentState.initialize();
                 }
                 step(dt) {
-                  this.currentState.step(dt);
+                    this.currentState.step(dt);
+                    this.lifeTime += dt;
+                    let scoreUpdateTime = 1;
+                    if(this.score.text.length>10){
+                      scoreUpdateTime = 1;
+                    } else if(this.score.text.length<10){
+                        scoreUpdateTime = 200;
+                    }
+                    if(this.lifeTime>this.lastScoreTime+scoreUpdateTime){
+                        this.removeFirstScore();
+                        this.lastScoreTime=this.lifeTime;
+                    }
                 }
 
                 doNormalStep(dt){
@@ -354,9 +378,13 @@
                     this.isAccelerating = false;
                     this.scoreText = new PIXI.Text('Score: 0', { fontFamily: 'Arial', fontSize: 24, fill: 0xffffff });
                     world.scoreText.x = 40;
-                                    world.scoreText.y = 40;
-                                    world.stage.addChild(world.scoreText);
-                   
+                    world.scoreText.y = 40;
+                    world.stage.addChild(world.scoreText);
+
+                    
+                    world.score.x = 60;
+                    world.score.y = 70;
+                    world.stage.addChild(world.score);
                     }
                     step(dt){
                         super.step(dt);
@@ -388,41 +416,40 @@
                           // Получить ссылку на объект еды
                         let food = world.objects.find((obj) => obj instanceof Food);
                         let foodOr = world.objects.find((obj) => obj instanceof FoodOrange);
-
-
-                                if (food) {
-                         // Передвигать игрока к объекту еды
+                            // Передвигать игрока к объекту еды
+                           if (food) {                      
                                     this.move2Point(food.x, food.y);
                                 } else if(foodOr){
                                     this.move2Point(foodOr.x, foodOr.y);
                                 }
                             }
                           
-                                checkWinCondition() {
-                                    
-                                if (this.score >= 500) {
-                                     console.log("Пользователь выиграл!");
-                                     world.overTable.x = 400;
-                                     world.overTable.y = 350;   
-                                     world.stage.addChild(world.overTable);
-                                    
-                                     world.startState(GameOverState);
-                                    
-                                    
-                                 
+                    checkWinCondition() {
+                            if (this.score >= 1000) {
+                                console.log("Пользователь выиграл!");
+                                world.overTable.x = 400;
+                                world.overTable.y = 350;   
+                                world.stage.addChild(world.overTable);
+                                world.startState(GameOverState);
                                  }
                             }
 
-                            onFoodEaten(){
-                                  this.score += 5;
-                                  this.energy += 1;                            
-                                  world.scoreText.text = `Score: ${this.score}`;
-                                  let nextDefenderPrice = 10 * (Defender.numDefenders + 1);
-                                  if (this.energy >= 20) {
-                                  if (Defender.numDefenders < 3) {
-                                      this.energy -= 10;
-                                         world.createObjectOfClass(Defender, this.x, this.y);
-                                        
+                    onFoodEaten(val){
+                        if(val===1){
+                            this.score += 5;
+                            this.energy += 1;
+                                world.showAddScore( `+5`);  
+                        }else if(val===2){
+                           this.score += 10;
+                           this.energy += 2;
+                                world.showAddScore( `+10`);  
+                        }                                                   
+                        world.scoreText.text = `Score: ${this.score}`;
+                            let nextDefenderPrice = 10 * (Defender.numDefenders + 1);
+                                if (this.energy >= 20) {
+                                if (Defender.numDefenders < 3) {
+                                    this.energy -= 10;
+                                    world.createObjectOfClass(Defender, this.x, this.y);      
                                  }
                              }
                              this.checkWinCondition();
@@ -554,7 +581,7 @@
 
                         if (d<=22){
                             this.mustBRemoved = true;
-                            world.player.onFoodEaten()
+                            world.player.onFoodEaten(1)
                            
                         }
                     }
@@ -562,18 +589,12 @@
 
                 class FoodOrange extends MovingObject{
                     constructor(x,y){
-                     super(x,y, 2*Math.PI*Math.random(), 3+Math.random());
-                        
-                   
-
-                    this.image = PIXI.Sprite.from('food.png');
-                    this.image.scale.set(0.25)
-                    this.image.anchor.set(0.8,0.8);
-                    this.addChild(this.image);
-                        
-                   
-                        
-                      this.image.tint = 0xFF6600;
+                        super(x,y, 2*Math.PI*Math.random(), 3+Math.random());
+                        this.image = PIXI.Sprite.from('food.png');
+                        this.image.scale.set(0.25)
+                        this.image.anchor.set(0.8,0.8);
+                        this.addChild(this.image);  
+                        this.image.tint = 0xFF6600;
                     }
                     makeDecision(){
                         let dx = world.player.x-this.x;
@@ -595,7 +616,7 @@
 
                         if (d<=22){
                             this.mustBRemoved = true;
-                            world.player.onFoodEaten()
+                            world.player.onFoodEaten(2)
                            
                         }
                     }
@@ -608,7 +629,6 @@
                         this.phi = Math.random()*2*Math.PI;
                         this.omega = 0.6;
                         this.R = 50;
-
                         Defender.numDefenders++;
                     }
                     step(dt){
