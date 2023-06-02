@@ -4,6 +4,7 @@
     </head>
     <body>
         <script>
+            
                 class State {
                         constructor(world){
                             this.world = world
@@ -162,7 +163,8 @@
                     this.currentState.initialize();
                 }
                 step(dt) {
-                  this.currentState.step(dt);
+                 
+    this.currentState.step(dt);
                 }
 
                 doNormalStep(dt){
@@ -651,13 +653,14 @@
                         world.handleKeyDown(e)
                     })
 
+                // Создание кнопки
                 world.createInitialObjects();
 
-                    function update(dt){
-                        world.step(dt);
-                    }
+function update(dt){
+    world.step(dt);
+}
 
-                    app.ticker.add(update)
+app.ticker.add(update)
         </script>
     </body>
 </html>

@@ -1,0 +1,38 @@
+<html>
+    <head>
+
+    </head>
+   
+    <body>
+        <style>
+            body {
+              background-image: url("images.jpg");
+              background-repeat: no-repeat;
+              background-size: 100% 100%;
+              display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                margin: 0;
+            }
+            #open-document-button {
+                font-size: 16px;
+                padding: 100px 200px;
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                cursor: pointer;
+                }
+
+                #open-document-button:hover {
+                    background-color: #45a049;
+                    }
+          </style>
+        <button id="open-document-button">Начать игру</button>
+        <script>
+            document.getElementById('open-document-button').addEventListener('click', function() {
+            window.location.href = 'pixivar2.html';
+          });
+        </script>
+    </body>
+</html>
