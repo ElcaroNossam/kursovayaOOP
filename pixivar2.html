@@ -177,6 +177,19 @@
                 }
                 step(dt) {
                   this.currentState.step(dt);
+                  
+                    this.lifeTime += dt;
+                    let scoreUpdateTime = 1;
+                    if(this.score.text.length>10){
+                      scoreUpdateTime = 1;
+                    } else if(this.score.text.length<10){
+                        scoreUpdateTime = 20;
+                    }
+                    if(this.lifeTime>this.lastScoreTime+scoreUpdateTime){
+                        this.removeFirstScore();
+                        this.lastScoreTime=this.lifeTime;
+                    }
+                
                 }
 
                 doNormalStep(dt){
@@ -242,7 +255,7 @@
                          this.player = null;
                 }
                 createInitialObjects(){
-                   this.createPlayer(250,350)
+                   this.createPlayer(250,250)
                    this.createObjectOfClass(Defender,0,0);
                    this.createObjectOfClass(Defender,0,0);
                    this.createObjectOfClass(Defender,0,0);
@@ -251,11 +264,11 @@
                    this.createSpawner(50,650)
                    this.createSpawnerFood(1300,700)
 
-                    for (let i=0; i<100; i++){
-                        this.createObjectOfClass(Food, 320,230)
+                    for (let i=0; i<50; i++){
+                        this.createObjectOfClass(Food, 520,430)
                     }
-                    for (let i=0; i<100; i++){
-                        this.createObjectOfClass(FoodOrange, 320,230)
+                    for (let i=0; i<30; i++){
+                        this.createObjectOfClass(FoodOrange, 520,530)
                     }
                    
                 }
@@ -403,10 +416,10 @@
                         this.isAccelerating = false;
                     }
                     makeDecision(){
-                          // Получить ссылку на объект еды
+                          
                         let food = world.objects.find((obj) => obj instanceof Food);
                         let foodOr = world.objects.find((obj) => obj instanceof FoodOrange);
-                            // Передвигать игрока к объекту еды
+                            
                            if (food) {                      
                                     this.move2Point(food.x, food.y);
                                 } else if(foodOr){
@@ -415,7 +428,7 @@
                             }
                           
                     checkWinCondition() {
-                            if (this.score >= 1000) {
+                            if (this.score >= 500) {
                                 console.log("Пользователь выиграл!");
                                 world.overTable.x = 400;
                                 world.overTable.y = 350;   
@@ -502,7 +515,7 @@
                     }
                     makeDecision(){
                         super.makeDecision();
-                        if(this.timePassed-this.lastCreationTime>=10) {
+                        if(this.timePassed-this.lastCreationTime>=50) {
                             world.createEnemy(this.x, this.y);
                             this.lastCreationTime = this.timePassed;
                         }
@@ -513,7 +526,7 @@
                 class SpawnerFood extends Enemy {
                     constructor(x,y){
                         super(x,y);
-                        this.speed = 0.1;
+                        this.speed = 0.0;
                         this.image.tint = 0x000fff ;
                         this.timePassed = 0;
                         this.lastCreationTime = 0
@@ -524,13 +537,13 @@
                     }
                     makeDecision(){
                         super.makeDecision();
-                        if(this.timePassed-this.lastCreationTime>=300) {
+                        if(this.timePassed-this.lastCreationTime>=200) {
                             world.createFood(this.x, this.y);
                             this.lastCreationTime = this.timePassed;
                         }
                              let dx = world.player.x-this.x;
                              let dy = world.player.y-this.y;
-                            let d = Math.sqrt(dx*dx+dy*dy);
+                             let d = Math.sqrt(dx*dx+dy*dy);
 
                           if(d<=250){
                                 this.move2Point(this.x-dx, this.y-dy)
@@ -633,6 +646,9 @@
                            if (!(enemies[i] instanceof Spawner)){ 
                            if (!(enemies[i] instanceof SpawnerFood)){                          
                             enemies[i].mustBRemoved=true;
+                           // world.score.text -= 5;
+                           world.showAddScore( `-5`);
+                            world.player.score -=5;
                         }
                        }
                       }
