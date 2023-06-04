@@ -149,7 +149,10 @@
                     this.scoreContainer = new PIXI.Container();
                    
                 
-                }      
+                }     
+                updateScore(points) {
+                    this.player.score -= points;
+                    } 
               
                 showAddScore(val) {
                     this.score.text +="\n"+ val;
@@ -320,7 +323,7 @@
                     this.speed = v;
                     this.turnSpeed = 0.5;
                     this.targetCourse = this.course;
-
+                    this.score = 0;
                     this.image = PIXI.Sprite.from('images.png');
                     this.image.scale.set(0.25)
                     this.image.anchor.set(0.5,0.5);
@@ -376,7 +379,7 @@
                     this.accelerateSpeed = 3*this.speed0;
                     this.image.tint = 0x00ff00
                     this.hitPoints = 100;
-                    this.score = 0;
+                   
                     this.energy = 10;
                     this.isAccelerating = false;
                     this.scoreText = new PIXI.Text('Score: 0', { fontFamily: 'Arial', fontSize: 24, fill: 0xffffff });
@@ -428,7 +431,7 @@
                             }
                           
                     checkWinCondition() {
-                            if (this.score >= 500) {
+                            if (this.score >= 300) {
                                 console.log("Пользователь выиграл!");
                                 world.overTable.x = 400;
                                 world.overTable.y = 350;   
@@ -439,15 +442,15 @@
 
                     onFoodEaten(val){
                         if(val===1){
-                            this.score += 5;
-                            this.energy += 1;
+                                this.score += 5;
+                                this.energy += 1;
                                 world.showAddScore( `+5`);  
                         }else if(val===2){
-                           this.score += 10;
-                           this.energy += 2;
+                                this.score += 10;
+                                this.energy += 2;
                                 world.showAddScore( `+10`);  
                         }                                                   
-                        world.scoreText.text = `Score: ${this.score}`;
+                            world.scoreText.text = `Score: ${this.score}`;
                             let nextDefenderPrice = 10 * (Defender.numDefenders + 1);
                                 if (this.energy >= 20) {
                                 if (Defender.numDefenders < 3) {
@@ -648,7 +651,8 @@
                             enemies[i].mustBRemoved=true;
                            // world.score.text -= 5;
                            world.showAddScore( `-5`);
-                            world.player.score -=5;
+                            //world.player.score -=5;
+                            world.updateScore(5);
                         }
                        }
                       }
@@ -680,11 +684,11 @@
                 // Создание кнопки
                 world.createInitialObjects();
 
-function update(dt){
-    world.step(dt);
-}
+                function update(dt){
+                    world.step(dt);
+                }
 
-app.ticker.add(update)
+                app.ticker.add(update)
         </script>
     </body>
 </html>
